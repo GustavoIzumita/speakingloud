@@ -100,22 +100,82 @@ button:hover {
     <button onclick="loginSistema()">Entrar</button>
 </div>
 
-<script>
-alert("JS do index carregou");
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-function loginSistema() {
+/* FIREBASE */
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "speaking-loud.firebaseapp.com",
+  projectId: "speaking-loud",
+  storageBucket: "speaking-loud.firebasestorage.app",
+  messagingSenderId: "1002979647448",
+  appId: "1:1002979647448:web:6dc375319cd8ac3aeadcad"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* LOGIN */
+window.loginSistema = async function () {
   const login = document.getElementById("login").value.trim().toLowerCase();
   const senha = document.getElementById("senha").value.trim();
 
+  // 🔴 LOGIN DE EMERGÊNCIA (DIRETOR)
   if (login === "gustavoimarzinotti" && senha === "gustavo123") {
     sessionStorage.setItem("diretorEmergencia", "true");
     window.location.href = "diretor/dashboard.html";
     return;
   }
 
-  alert("Login bloqueado (modo emergência)");
-}
+  if (!login || !senha) {
+    alert("Preencha login e senha");
+    return;
+  }
+
+  const emailFirebase = login.includes("@")
+    ? login
+    : login + "@speakingloud.com";
+
+  try {
+    const cred = await signInWithEmailAndPassword(
+      auth,
+      emailFirebase,
+      senha
+    );
+
+    const uid = cred.user.uid;
+    const snapUsuario = await getDoc(doc(db, "usuarios", uid));
+
+    if (!snapUsuario.exists()) {
+      alert("Usuário sem permissão");
+      return;
+    }
+
+    const tipo = snapUsuario.data().tipo;
+
+    if (tipo === "diretor") {
+      window.location.href = "diretor/dashboard.html";
+      return;
+    }
+
+    if (tipo === "escola") {
+      window.location.href = "escola/dashboard.html";
+      return;
+    }
+
+    alert("Usuário sem permissão");
+  } catch (e) {
+    alert("Login ou senha inválidos");
+  }
+};
 </script>
+
 
 
 </body>

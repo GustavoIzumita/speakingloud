@@ -502,7 +502,7 @@ const storage = getStorage(app);
 /* ================= AUTH - ESCOLA ================= */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.replace("/index.html");
+    window.location.href = "../index.html";
     return;
   }
 
@@ -510,13 +510,12 @@ onAuthStateChanged(auth, async (user) => {
   const snap = await getDoc(doc(db, "usuarios", uid));
 
   if (!snap.exists() || snap.data().tipo !== "escola") {
-    window.location.replace("/index.html");
+    window.location.href = "../index.html";
     return;
   }
 
-  await initDashboard();
+  // ✅ secretário autorizado
 });
-
 // ================= DOM =================
 const listaAlunos = document.getElementById("listaAlunos");
 

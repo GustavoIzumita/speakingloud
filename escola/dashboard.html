@@ -642,6 +642,12 @@ window.salvarAluno = async function () {
   senhaAluno
 );
 
+await signInWithEmailAndPassword(
+  auth,
+  auth.currentUser.email,
+  prompt("Digite novamente sua senha de escola")
+);
+
 // 🔥 RESETA CONTEXTO PARA ESCOLA
 const emailEscola = auth.currentUser.email;
 const uidAluno = cred.user.uid;

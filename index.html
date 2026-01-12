@@ -100,114 +100,23 @@ button:hover {
     <button onclick="loginSistema()">Entrar</button>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } 
-  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script>
+alert("JS do index carregou");
 
-/* ================= FIREBASE CONFIG ================= */
-const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "speaking-loud.firebaseapp.com",
-  projectId: "speaking-loud",
-  storageBucket: "speaking-loud.firebasestorage.app",
-  messagingSenderId: "1002979647448",
-  appId: "1:1002979647448:web:6dc375319cd8ac3aeadcad"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* ================= LOGIN ================= */
-window.loginSistema = async function () {
-  const login = document
-  .getElementById("login")
-  .value
-  .trim()
-  .toLowerCase();
+function loginSistema() {
+  const login = document.getElementById("login").value.trim().toLowerCase();
   const senha = document.getElementById("senha").value.trim();
 
-
-    // 🔴 LOGIN DE EMERGÊNCIA
   if (login === "gustavoimarzinotti" && senha === "gustavo123") {
-  sessionStorage.setItem("diretorEmergencia", "true");
-  window.location.replace("/diretor/dashboard.html");
-  return;
-}
-
-  if (!login || !senha) {
-    alert("Preencha login e senha");
+    sessionStorage.setItem("diretorEmergencia", "true");
+    window.location.href = "diretor/dashboard.html";
     return;
   }
 
-  const emailFirebase = login.includes("@")
-    ? login
-    : login + "@speakingloud.com";
-
-  try {
-    const { user } = await signInWithEmailAndPassword(
-      auth,
-      emailFirebase,
-      senha
-    );
-
-    const uid = user.uid;
-
-    // 🔍 1️⃣ verifica DIRETOR / SECRETÁRIO
-    const snapUsuario = await getDoc(doc(db, "usuarios", uid));
-    if (snapUsuario.exists()) {
-      const tipo = snapUsuario.data().tipo;
-
-      if (tipo === "diretor") {
-  window.location.replace("/diretor/dashboard.html");
-  return;
+  alert("Login bloqueado (modo emergência)");
 }
-
-if (tipo === "escola") {
-  window.location.replace("/escola/dashboard.html");
-  return;
-}
-    }
-
-    // 🔍 2️⃣ verifica ALUNO (por login)
-const loginLimpo = login.includes("@")
-  ? login.split("@")[0]
-  : login;
-
-  const qAluno = query(
-  collection(db, "alunos"),
-  where("login", "==", loginLimpo)
-);
-
-    const snapAluno = await getDocs(qAluno);
-
-    if (!snapAluno.empty) {
-  window.location.replace("/aluno/dashboard.html");
-  return;
-}
-
-    // ❌ ninguém autorizado
-    alert("Usuário sem permissão");
-    await auth.signOut();
-
-  } catch (error) {
-    console.error(error);
-    alert("Login ou senha inválidos");
-  }
-};
-
-
 </script>
+
 
 </body>
 </html>

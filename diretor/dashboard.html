@@ -242,23 +242,27 @@ const db = getFirestore(app);
 
 /* ================= AUTH - DIRETOR ================= */
 onAuthStateChanged(auth, async (user) => {
+
+  // 🔴 ACESSO DE EMERGÊNCIA
+  if (sessionStorage.getItem("diretorEmergencia") === "true") {
+    console.warn("⚠️ Diretor em modo emergência");
+    return;
+  }
+
   if (!user) {
     window.location.replace("/index.html");
     return;
   }
 
   const uid = user.uid;
-
   const snap = await getDoc(doc(db, "usuarios", uid));
 
-  // ❌ não existe ou não é diretor → fora
   if (!snap.exists() || snap.data().tipo !== "diretor") {
     window.location.replace("/index.html");
     return;
   }
-
-  // ✅ passou → pode usar o dashboard do diretor
 });
+
 
 
 /* AUTH SECUNDÁRIO PARA CRIAR SECRETÁRIOS */

@@ -202,15 +202,14 @@ th, td {
 </div>
 
 <script type="module">
+
 //const emergencia = sessionStorage.getItem("diretorEmergencia");
 
   //if (!emergencia) {
    // window.location.href = "../index.html";
  // }
 
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   getFirestore,
   collection,
@@ -225,6 +224,10 @@ import { getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.
 
 import { onAuthStateChanged } from 
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { getAuth } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSy...",
@@ -243,9 +246,10 @@ const db = getFirestore(app);
 /* ================= AUTH - DIRETOR ================= */
 onAuthStateChanged(auth, async (user) => {
 
-  // 🔴 ACESSO DE EMERGÊNCIA
+
   if (sessionStorage.getItem("diretorEmergencia") === "true") {
     console.warn("⚠️ Diretor em modo emergência");
+    await renderUsuarios();
     return;
   }
 
@@ -261,7 +265,11 @@ onAuthStateChanged(auth, async (user) => {
     window.location.replace("/index.html");
     return;
   }
+
+  // ✅ SÓ AQUI o diretor está autenticado
+  await renderUsuarios();
 });
+
 
 
 
@@ -290,22 +298,16 @@ window.salvarUsuario = async function () {
   const emailFirebase = loginVal + "@speakingloud.com";
 
   try {
-    // 1️⃣ cria no AUTH
-    const cred = await createUserWithEmailAndPassword(
-      secondaryAuth,
-      emailFirebase,
-      senhaVal
-    );
+    const uid = crypto.randomUUID();
 
-    const uid = cred.user.uid;
-
-    // 2️⃣ cria no FIRESTORE (usuarios)
     await setDoc(doc(db, "usuarios", uid), {
-  nome: nomeVal,
-  email: emailFirebase,
-  tipo: "escola",
-  criadoEm: new Date()
-});
+      nome: nomeVal,
+      email: emailFirebase,
+      tipo: "escola",
+      criadoEm: new Date()
+    });
+
+    await renderUsuarios();
 
     alert(
       `Secretário criado com sucesso!\n\n` +
@@ -313,17 +315,13 @@ window.salvarUsuario = async function () {
     );
 
     limparCampos();
-    renderUsuarios();
 
   } catch (error) {
-    if (error.code === "auth/email-already-in-use") {
-      alert("Esse login já existe");
-    } else {
-      console.error(error);
-      alert("Erro ao criar secretário");
-    }
+    console.error(error);
+    alert("Erro ao criar secretário");
   }
 };
+
 
 
 function limparCampos(){
@@ -387,11 +385,7 @@ window.excluirUsuario = async function (uid) {
   }
 };
 
-
-renderUsuarios();
-
 </script>
 
 </body>
 </html>
-

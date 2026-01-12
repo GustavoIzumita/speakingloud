@@ -645,14 +645,6 @@ window.salvarAluno = async function () {
 
 // 🔥 RESETA CONTEXTO PARA ESCOLA
 const emailEscola = auth.currentUser.email;
-
-await auth.signOut();
-
-await signInWithEmailAndPassword(
-  auth,
-  emailEscola,
-  prompt("Digite novamente a senha da escola:")
-);
 const uidAluno = cred.user.uid;
 
     // ✅ SALVA NO FIRESTORE

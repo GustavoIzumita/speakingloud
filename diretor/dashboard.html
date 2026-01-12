@@ -202,11 +202,9 @@ th, td {
 </div>
 
 <script type="module">
-// 🔴 LIBERA DIRETOR EM LOGIN DE EMERGÊNCIA
-if (sessionStorage.getItem("diretorEmergencia") === "true") {
-  // não faz nada, deixa entrar
-} else {
-  // Firebase continua normal
+if (sessionStorage.getItem("diretorEmergencia") !== "true") {
+  alert("Acesso negado");
+  window.location.replace("/index.html");
 }
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";

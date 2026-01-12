@@ -190,7 +190,7 @@ th, td {
 <thead>
 <tr>
 <th>Nome</th>
-<th>Login</th>
+<th>Email</th>
 <th>Ações</th>
 </tr>
 </thead>
@@ -355,22 +355,22 @@ async function renderUsuarios() {
   }
 
   secretarios.forEach(docSnap => {
-    const u = docSnap.data();
-    const id = docSnap.id;
+  const u = docSnap.data();
+  const id = docSnap.id;
 
-    listaUsuarios.innerHTML += `
-      <tr>
-        <td>${u.nome}</td>
-        <td>${u.email}</td>
-        <td>
-          <button class="delete"
-            onclick="excluirUsuario('${id}')">
-            Excluir
-          </button>
-        </td>
-      </tr>
-    `;
-  });
+  listaUsuarios.innerHTML += `
+    <tr>
+      <td>${u.nome || "-"}</td>
+      <td>${u.email || "-"}</td>
+      <td>
+        <button class="delete" onclick="excluirUsuario('${id}')">
+          Excluir
+        </button>
+      </td>
+    </tr>
+  `;
+});
+
 }
 
 window.excluirUsuario = async function (uid) {

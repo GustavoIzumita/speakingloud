@@ -301,11 +301,11 @@ window.salvarUsuario = async function () {
 
     // 2️⃣ cria no FIRESTORE (usuarios)
     await setDoc(doc(db, "usuarios", uid), {
-      nome: nomeVal,
-      email: emailFirebase,
-      tipo: "escola",
-      criadoEm: new Date()
-    });
+  nome: nomeVal,
+  email: emailFirebase,
+  tipo: "escola",
+  criadoEm: new Date()
+});
 
     alert(
       `Secretário criado com sucesso!\n\n` +

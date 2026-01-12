@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking Loud | Login</title>
+
+<style>
+
+    * {
+  box-sizing: border-box;
+}
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #7f1d1d, #991b1b);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* CAIXA DE LOGIN */
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.25);
+    text-align: center;
+    overflow: hidden; /* 🔥 evita vazamento visual */
+}
+
+.login-box h1 {
+    margin-bottom: 10px;
+    color: #7f1d1d;
+}
+
+.login-box p {
+    margin-bottom: 30px;
+    color: #6b7280;
+}
+
+/* INPUTS */
+input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 16px;
+    display: block;
+}
+
+/* BOTÃO */
+button {
+    width: 100%;
+    padding: 14px;
+    background: #991b1b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #7f1d1d;
+}
+
+/* ===== RESPONSIVO EXTRA ===== */
+@media (max-width: 480px) {
+
+    .login-box {
+        padding: 28px;
+    }
+
+    .login-box h1 {
+        font-size: 24px;
+    }
+
+    .login-box p {
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+    <h1>Speaking Loud</h1>
+    <p>Acesso ao sistema</p>
+
+    <input id="login" placeholder="Login">
+    <input id="senha" type="password" placeholder="Senha">
+
+    <button onclick="loginSistema()">Entrar</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* ================= FIREBASE CONFIG ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "speaking-loud.firebaseapp.com",
+  projectId: "speaking-loud",
+  storageBucket: "speaking-loud.firebasestorage.app",
+  messagingSenderId: "1002979647448",
+  appId: "1:1002979647448:web:6dc375319cd8ac3aeadcad"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ================= LOGIN ================= */
+window.loginSistema = async function () {
+  const login = document
+  .getElementById("login")
+  .value
+  .trim()
+  .toLowerCase();
+  const senha = document.getElementById("senha").value.trim();
+
+  if (!login || !senha) {
+    alert("Preencha login e senha");
+    return;
+  }
+
+  const emailFirebase = login.includes("@")
+    ? login
+    : login + "@speakingloud.com";
+
+  try {
+    const { user } = await signInWithEmailAndPassword(
+      auth,
+      emailFirebase,
+      senha
+    );
+
+    const uid = user.uid;
+
+    // 🔍 1️⃣ verifica DIRETOR / SECRETÁRIO
+    const snapUsuario = await getDoc(doc(db, "usuarios", uid));
+    if (snapUsuario.exists()) {
+      const tipo = snapUsuario.data().tipo;
+
+      if (tipo === "diretor") {
+  window.location.replace("/diretor/dashboard.html");
+  return;
+}
+
+if (tipo === "escola") {
+  window.location.replace("/escola/dashboard.html");
+  return;
+}
+    }
+
+    // 🔍 2️⃣ verifica ALUNO (por login)
+const loginLimpo = login.includes("@")
+  ? login.split("@")[0]
+  : login;
+
+  const qAluno = query(
+  collection(db, "alunos"),
+  where("login", "==", loginLimpo)
+);
+
+    const snapAluno = await getDocs(qAluno);
+
+    if (!snapAluno.empty) {
+  window.location.replace("/aluno/dashboard.html");
+  return;
+}
+
+    // ❌ ninguém autorizado
+    alert("Usuário sem permissão");
+    await auth.signOut();
+
+  } catch (error) {
+    console.error(error);
+    alert("Login ou senha inválidos");
+  }
+};
+
+
+</script>
+
+</body>
+</html>
